@@ -628,6 +628,15 @@ const ISSUES = [
     active: "Supports international alliances and diplomacy as primary tools, with military force as a last resort. Favors multilateral cooperation on shared threats (pandemics, climate, nuclear proliferation).",
     contextFn: () => null,
   },
+  {
+    id: "mental_health",
+    label: "Mental Health & Addiction",
+    limited: "Favors community-based and faith-based programs over large federal mandates, arguing that local organizations better understand their communities' needs. Supports expanding private insurance options and reducing regulations that limit treatment providers.",
+    active: "Supports expanding Medicaid coverage for mental health services, federal funding for addiction treatment, and requiring insurers to cover mental health on par with physical health (parity laws). Points to high rates of untreated illness as a market failure.",
+    contextFn: (s) => s.benefits.includes("Medicaid or CHIP")
+      ? "Mental health parity requirements and Medicaid coverage expansions directly affect what services are available to you at low or no cost."
+      : null,
+  },
 ];
 
 const RESEARCH_STEPS = [
