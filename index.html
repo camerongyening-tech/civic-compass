@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Civic Compass</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:   #f8f4ec;
+      --paper2:  #f0ead8;
+      --ink:     #1c1a14;
+      --ink2:    #4a4535;
+      --ink3:    #7a7260;
+      --rule:    #d8ceb8;
+      --accent:  #5c4a1e;
+      --accent2: #8b6914;
+      --warm:    #c8a96e;
+      --tag-bg:  #e8dfc8;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    #root { min-height: 100vh; }
+
+    /* ── Layout ── */
+    .page-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ── Masthead ── */
+    .masthead {
+      border-bottom: 2px solid var(--ink);
+      padding: 28px 0 16px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .masthead-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 6px;
+    }
+    .masthead-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      line-height: 1.1;
+    }
+    .masthead-sub {
+      font-style: italic;
+      color: var(--ink2);
+      font-size: 1rem;
+      margin-top: 6px;
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      margin-bottom: 36px;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .progress-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      cursor: pointer;
+      transition: color .2s;
+    }
+    .progress-label.active { color: var(--accent); font-weight: 700; }
+    .progress-track {
+      height: 4px;
+      background: var(--rule);
+      border-radius: 2px;
+      overflow: visible;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent2);
+      border-radius: 2px;
+      transition: width .4s ease;
+    }
+
+    /* ── Section heading ── */
+    .step-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 6px;
+    }
+    .step-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      color: var(--ink);
+    }
+    .step-intro {
+      color: var(--ink2);
+      margin-bottom: 28px;
+      font-size: .97rem;
+    }
+
+    /* ── Rule divider ── */
+    .rule { border: none; border-top: 1px solid var(--rule); margin: 28px 0; }
+
+    /* ── Branch cards ── */
+    .branch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .branch-card {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 20px;
+    }
+    .branch-card h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .branch-card .branch-subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+    .branch-card p { font-size: .9rem; color: var(--ink2); margin-bottom: 8px; }
+    .branch-card ul { padding-left: 18px; }
+    .branch-card li { font-size: .87rem; color: var(--ink2); margin-bottom: 3px; }
+
+    .checks-box {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+    .checks-box h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .checks-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: .9rem;
+      color: var(--ink2);
+    }
+    .checks-item::before {
+      content: '↔';
+      color: var(--warm);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Systems comparison ── */
+    .system-section { margin-bottom: 32px; }
+    .system-section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .compare-card {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 18px;
+    }
+    .compare-card h4 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+    .compare-card p { font-size: .88rem; color: var(--ink2); margin-bottom: 8px; }
+    .compare-card ul { padding-left: 16px; }
+    .compare-card li { font-size: .85rem; color: var(--ink2); margin-bottom: 4px; }
+    .disclaimer-note {
+      font-style: italic;
+      font-size: .84rem;
+      color: var(--ink3);
+      margin-top: 8px;
+    }
+
+    /* ── About You ── */
+    .question-block { margin-bottom: 28px; }
+    .question-label {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .btn-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .choice-btn {
+      background: var(--paper2);
+      border: 1.5px solid var(--rule);
+      border-radius: 4px;
+      padding: 9px 16px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: .88rem;
+      color: var(--ink2);
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      text-align: left;
+    }
+    .choice-btn:hover { border-color: var(--accent2); color: var(--ink); }
+    .choice-btn.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #f8f4ec;
+    }
+    .multi-note {
+      font-size: .8rem;
+      font-style: italic;
+      color: var(--ink3);
+      margin-top: 6px;
+    }
+    .privacy-banner {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--warm);
+      padding: 12px 16px;
+      font-size: .85rem;
+      color: var(--ink2);
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+
+    /* ── Breakdown ── */
+    .breakdown-intro {
+      font-size: .9rem;
+      color: var(--ink2);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+    .issue-breakdown {
+      margin-bottom: 36px;
+    }
+    .issue-breakdown-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+    .approach-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .approach-card {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 16px;
+    }
+    .approach-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 6px;
+    }
+    .approach-card p { font-size: .87rem; color: var(--ink2); }
+    .context-note {
+      font-size: .83rem;
+      font-style: italic;
+      color: var(--ink3);
+      margin-top: 6px;
+      padding-left: 2px;
+    }
+
+    .research-box {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 24px;
+      margin-top: 36px;
+    }
+    .research-box h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .research-box ol { padding-left: 20px; }
+    .research-box li { font-size: .9rem; color: var(--ink2); margin-bottom: 10px; }
+    .research-box a { color: var(--accent2); }
+    .research-box .trade-off-note {
+      margin-top: 16px;
+      font-size: .87rem;
+      color: var(--ink2);
+      font-style: italic;
+      border-top: 1px solid var(--rule);
+      padding-top: 12px;
+    }
+
+    /* ── Nav buttons ── */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--rule);
+    }
+    .nav-btn {
+      background: none;
+      border: 1.5px solid var(--ink);
+      border-radius: 4px;
+      padding: 10px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      color: var(--ink);
+    }
+    .nav-btn:hover { background: var(--ink); color: var(--paper); }
+    .nav-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--paper);
+    }
+    .nav-btn.primary:hover { background: var(--ink); border-color: var(--ink); }
+    .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .nav-btn:disabled:hover { background: none; color: var(--ink); }
+    .nav-btn.primary:disabled:hover { background: var(--accent); color: var(--paper); }
+
+    .step-counter {
+      font-family: 'Inter', sans-serif;
+      font-size: .78rem;
+      color: var(--ink3);
+      letter-spacing: .06em;
+    }
+
+    /* ── Responsive tweaks ── */
+    @media (max-width: 540px) {
+      .compare-grid, .approach-pair { grid-template-columns: 1fr; }
+      .branch-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+/* ═══════════════════════════════════════════════════════════════
+   DATA — edit these arrays to update lesson content and issues
+   ═══════════════════════════════════════════════════════════════ */
+
+const BRANCHES = [
+  {
+    name: "Legislative",
+    subtitle: "Congress",
+    members: "Two chambers: the Senate (100 senators, 2 per state) and the House of Representatives (435 members, apportioned by population).",
+    role: "Makes federal law, controls the federal budget, and declares war.",
+    powers: [
+      "Write and pass bills",
+      "Override a presidential veto (2/3 majority)",
+      "Approve treaties and presidential appointments",
+      "Impeach the President or federal judges",
+    ],
+  },
+  {
+    name: "Executive",
+    subtitle: "President & Cabinet",
+    members: "The President, Vice President, and the Cabinet (heads of 15 departments such as Defense, Treasury, and Education).",
+    role: "Carries out and enforces laws; leads foreign policy and the military.",
+    powers: [
+      "Sign or veto legislation",
+      "Issue executive orders",
+      "Nominate federal judges and Cabinet members",
+      "Command the armed forces",
+    ],
+  },
+  {
+    name: "Judicial",
+    subtitle: "Federal Courts",
+    members: "The Supreme Court (9 justices, appointed for life) and lower federal courts.",
+    role: "Interprets laws and the Constitution; can strike down laws that violate constitutional rights.",
+    powers: [
+      "Declare laws unconstitutional (judicial review)",
+      "Interpret the meaning of federal law",
+      "Settle disputes between states",
+      "Protect individual rights against government overreach",
+    ],
+  },
+];
+
+const CHECKS = [
+  "Congress passes laws → President can veto them → Congress can override the veto.",
+  "President nominates judges → Senate confirms or rejects them.",
+  "Courts can strike down laws passed by Congress or actions by the President.",
+  "Congress controls the budget — even the President cannot spend money Congress hasn't approved.",
+  "Congress can remove the President or federal judges through impeachment and trial.",
+];
+
+const ECONOMIC_SYSTEMS = [
+  {
+    label: "Capitalism (Market Economy)",
+    summary: "Economic decisions are driven mainly by private individuals and businesses competing in a free market. Prices, wages, and production are set by supply and demand.",
+    traits: [
+      "Private ownership of businesses and property",
+      "Profit motive drives innovation and efficiency",
+      "Government role is limited — mainly enforcing contracts and property rights",
+      "Inequality can grow; success is tied to market outcomes",
+    ],
+  },
+  {
+    label: "Socialism (Mixed / Collective Economy)",
+    summary: "Key industries or services are owned or regulated collectively (by government or cooperative enterprises) to ensure broader access and reduce inequality.",
+    traits: [
+      "Government owns or heavily regulates major industries",
+      "Stronger social safety net (housing, healthcare, education)",
+      "Higher taxes to fund public services",
+      "Less income inequality; individual economic freedom may be reduced",
+    ],
+  },
+];
+
+const POLITICAL_SPECTRUMS = [
+  {
+    label: "Conservative (Limited Government)",
+    summary: "Favors preserving established institutions and traditional values; generally prefers less government involvement in the economy and personal life, lower taxes, and strong national defense.",
+    traits: [
+      "Lower taxes and less government regulation",
+      "Emphasis on individual responsibility and free markets",
+      "Traditional social and cultural values",
+      "Stronger military and border security",
+    ],
+  },
+  {
+    label: "Liberal (Active Government)",
+    summary: "Favors using government as a tool to address inequality and social problems; generally supports stronger regulations, a broader safety net, and policies protecting historically marginalized groups.",
+    traits: [
+      "Higher taxes (often on wealth/corporations) to fund programs",
+      "Stronger environmental and labor regulations",
+      "Expanding civil rights and social equity programs",
+      "Diplomacy-first foreign policy",
+    ],
+  },
+];
+
+const INCOME_RANGES = [
+  "Under $25,000",
+  "$25,000 – $50,000",
+  "$50,000 – $75,000",
+  "$75,000 – $100,000",
+  "$100,000 – $150,000",
+  "Over $150,000",
+  "Prefer not to say",
+];
+
+const TAX_RANGES = [
+  "Very little or none",
+  "A few hundred dollars a year",
+  "A few thousand a year",
+  "$10,000 – $25,000 a year",
+  "Over $25,000 a year",
+  "Not sure",
+];
+
+const BENEFITS_OPTIONS = [
+  "SNAP / EBT (food assistance)",
+  "Medicaid or CHIP",
+  "Housing assistance / Section 8",
+  "Unemployment insurance",
+  "Social Security or disability",
+  "None of the above",
+];
+
+const RELIGION_OPTIONS = [
+  "Very important — central to my worldview",
+  "Somewhat important",
+  "Not very important",
+  "Not important at all",
+];
+
+// ── Issues list — add, remove, or edit entries here ──
+const ISSUES = [
+  {
+    id: "healthcare",
+    label: "Healthcare",
+    limited: "Believes the private market, competition, and consumer choice produce better outcomes and lower costs than government programs. Favors expanding health savings accounts and allowing more plan options. Concerned that government programs create inefficiency and raise costs long-term.",
+    active: "Supports expanding public options or universal coverage to ensure everyone has access regardless of employment or income. Points to high uninsured rates and medical bankruptcies as market failures that require a government response.",
+    contextFn: (s) => s.benefits.includes("Medicaid or CHIP")
+      ? "You indicated you or your household use Medicaid — consider how changes to that program might affect your coverage."
+      : s.income === "Under $25,000" || s.income === "$25,000 – $50,000"
+      ? "At your income level, access to affordable coverage and the trade-off between premiums and out-of-pocket costs is especially relevant."
+      : null,
+  },
+  {
+    id: "taxes",
+    label: "Taxes & Government Spending",
+    limited: "Argues that lower taxes — especially on businesses and investment — stimulate growth, create jobs, and let people keep more of what they earn. Prefers cutting spending over raising revenue, and returning spending decisions to states.",
+    active: "Argues that adequate tax revenue — particularly from higher earners — funds the roads, schools, safety-net programs, and research that benefit everyone. Sees progressive taxation as a way to reduce wealth concentration.",
+    contextFn: (s) => s.taxes === "Over $25,000 a year" || s.taxes === "$10,000 – $25,000 a year"
+      ? "You pay significant taxes — you may feel the impact of tax policy more directly than most households."
+      : s.taxes === "Very little or none"
+      ? "If you pay little in income taxes, tax-rate debates may matter less to your wallet than debates about the services those taxes fund."
+      : null,
+  },
+  {
+    id: "education",
+    label: "Education",
+    limited: "Favors school choice (charter schools, vouchers, homeschool freedom) to give parents options and force schools to compete for students. Prefers local and state control of curriculum over federal mandates. Concerned about public-school performance and bureaucracy.",
+    active: "Supports increased federal and state funding for public schools, universal pre-K, and reducing reliance on local property taxes (which create funding inequality between rich and poor districts). Sees education as a public good requiring collective investment.",
+    contextFn: () => null,
+  },
+  {
+    id: "economy_jobs",
+    label: "Economy & Jobs",
+    limited: "Supports deregulation, free trade or targeted tariffs to protect domestic industries, and tax incentives for businesses to hire. Believes reducing barriers to starting and running a business creates the most jobs.",
+    active: "Supports raising the minimum wage, strengthening unions, investing in infrastructure and clean energy as job creators, and regulating industries to prevent worker exploitation.",
+    contextFn: (s) => s.income === "Under $25,000" || s.income === "$25,000 – $50,000"
+      ? "Minimum wage and wage-growth policies have a larger proportional impact at lower income levels."
+      : null,
+  },
+  {
+    id: "immigration",
+    label: "Immigration",
+    limited: "Prioritizes stricter border security and enforcement of existing immigration law. Prefers a merit-based system that selects immigrants on skills and economic contribution. Concerned about rule of law and impact on wages for native-born workers.",
+    active: "Supports pathways to legal status for long-term residents, higher refugee admissions, and comprehensive immigration reform. Points to immigrants' economic contributions and humanitarian obligations as reasons for more open policies.",
+    contextFn: () => null,
+  },
+  {
+    id: "environment",
+    label: "Environment & Energy",
+    limited: "Skeptical of aggressive climate regulations that raise energy costs or eliminate fossil-fuel jobs. Favors innovation and market-driven solutions (carbon markets, clean-tech investment) over mandates. Prioritizes energy independence and affordability.",
+    active: "Supports strong regulations on emissions, transition mandates for clean energy, and government investment in renewables. Points to scientific consensus on climate risk and the long-term economic cost of inaction.",
+    contextFn: () => null,
+  },
+  {
+    id: "crime_safety",
+    label: "Crime & Public Safety",
+    limited: "Supports robust funding for law enforcement, stricter sentencing, and the right to armed self-defense (Second Amendment). Believes strong consequences deter crime and that communities need dependable policing.",
+    active: "Supports addressing root causes of crime (poverty, mental health, housing) alongside policing reform to reduce bias. Favors common-sense gun-safety regulations, citing data on gun violence rates.",
+    contextFn: () => null,
+  },
+  {
+    id: "social_issues",
+    label: "Social & Cultural Issues",
+    limited: "Tends to favor policies that preserve traditional family structures and religious liberty. Prefers that contentious social questions be decided by elected legislatures (at state or federal level) rather than courts.",
+    active: "Tends to favor expanding civil-rights protections and anti-discrimination laws. Supports court and legislative action to protect freedoms related to gender, sexuality, and bodily autonomy.",
+    contextFn: (s) => s.religion === "Very important — central to my worldview"
+      ? "You noted religion is central to your worldview — religious liberty considerations on both sides of this issue may be especially relevant to you."
+      : null,
+  },
+  {
+    id: "housing",
+    label: "Housing & Cost of Living",
+    limited: "Supports removing zoning restrictions and regulations that limit new construction, arguing that more supply naturally lowers prices. Skeptical of rent control, which economic research suggests can reduce housing supply long-term.",
+    active: "Supports public investment in affordable housing, stronger tenant protections, and rent stabilization measures to protect lower-income residents from displacement while supply catches up.",
+    contextFn: (s) => s.benefits.includes("Housing assistance / Section 8")
+      ? "You indicated you use housing assistance — federal and local housing policy changes could directly affect your situation."
+      : null,
+  },
+  {
+    id: "national_defense",
+    label: "National Defense & Foreign Policy",
+    limited: "Supports a strong military and a foreign policy that prioritizes American interests, skeptical of multilateral institutions that constrain U.S. action. May favor 'peace through strength' deterrence.",
+    active: "Supports international alliances and diplomacy as primary tools, with military force as a last resort. Favors multilateral cooperation on shared threats (pandemics, climate, nuclear proliferation).",
+    contextFn: () => null,
+  },
+];
+
+const RESEARCH_STEPS = [
+  { text: <><strong>Ballotpedia.org</strong> — Find every candidate on your actual ballot by address. Read their positions, endorsements, and voting history in plain language.</> },
+  { text: <><strong>Vote411.org</strong> (by the League of Women Voters) — Candidates answer standardized questions side by side, making comparison easy.</> },
+  { text: <><strong>Check voting records</strong> — For incumbents, GovTrack.us and Congress.gov show every bill a federal representative voted on. Words are easy; votes are harder to spin.</> },
+  { text: <><strong>Follow the money</strong> — OpenSecrets.org shows who funds each campaign. Large donors often signal which industries or interests a candidate prioritizes.</> },
+  { text: <><strong>Watch for trade-offs in your own answers</strong> — If you want lower taxes AND more services, ask each candidate specifically how they reconcile that. Candidates who avoid the trade-off question are telling you something.</> },
+  { text: <><strong>Read local coverage</strong> — National media focuses on national races. Local newspapers and public radio stations cover the school board, judges, and ballot measures that affect your daily life more directly.</> },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
+
+const { useState } = React;
+
+const TOTAL_STEPS = 4;
+
+function ProgressBar({ step }) {
+  const labels = ["The Three Branches", "Economic & Political Systems", "About You", "Your Breakdown"];
+  const pct = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
+  return (
+    <div className="progress-wrap">
+      <div className="progress-labels">
+        {labels.map((l, i) => (
+          <span key={i} className={`progress-label${step === i + 1 ? " active" : ""}`}>
+            {i + 1}. {l}
+          </span>
+        ))}
+      </div>
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+// Step 1
+function StepBranches() {
+  return (
+    <>
+      <p className="step-eyebrow">Step 1 of 4</p>
+      <h2 className="step-title">The Three Branches of Government</h2>
+      <p className="step-intro">
+        The U.S. Constitution splits federal power among three co-equal branches so that no single person or group can control the government. Here's who is in each branch, what they do, and how they keep each other in check.
+      </p>
+
+      <div className="branch-grid">
+        {BRANCHES.map((b) => (
+          <div key={b.name} className="branch-card">
+            <p className="branch-subtitle">{b.subtitle}</p>
+            <h3>{b.name} Branch</h3>
+            <p>{b.members}</p>
+            <p><em>{b.role}</em></p>
+            <ul>{b.powers.map((p, i) => <li key={i}>{p}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="checks-box">
+        <h3>Checks & Balances</h3>
+        <p style={{ fontSize: ".9rem", color: "var(--ink2)", marginBottom: 12 }}>
+          Each branch has specific powers to limit the others — preventing any branch from becoming too powerful.
+        </p>
+        {CHECKS.map((c, i) => <div key={i} className="checks-item">{c}</div>)}
+      </div>
+    </>
+  );
+}
+
+// Step 2
+function StepSystems() {
+  return (
+    <>
+      <p className="step-eyebrow">Step 2 of 4</p>
+      <h2 className="step-title">Economic & Political Systems</h2>
+      <p className="step-intro">
+        These are two separate spectrums that often get conflated. Economic systems describe <em>who owns and controls resources</em>. Political orientation describes <em>the role of government in society</em>. Most real-world positions are a blend — these are broad generalizations to anchor your thinking.
+      </p>
+
+      <div className="system-section">
+        <p className="system-section-title">Economic Systems: How resources and production are managed</p>
+        <div className="compare-grid">
+          {ECONOMIC_SYSTEMS.map((s) => (
+            <div key={s.label} className="compare-card">
+              <h4>{s.label}</h4>
+              <p>{s.summary}</p>
+              <ul>{s.traits.map((t, i) => <li key={i}>{t}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+        <p className="disclaimer-note">Most developed economies — including the U.S. — are mixed economies with elements of both.</p>
+      </div>
+
+      <hr className="rule" />
+
+      <div className="system-section">
+        <p className="system-section-title">Political Orientation: The proper role and size of government</p>
+        <div className="compare-grid">
+          {POLITICAL_SPECTRUMS.map((s) => (
+            <div key={s.label} className="compare-card">
+              <h4>{s.label}</h4>
+              <p>{s.summary}</p>
+              <ul>{s.traits.map((t, i) => <li key={i}>{t}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+        <p className="disclaimer-note">Almost everyone holds a mix of views. These labels are starting points, not rigid boxes. Real candidates and real policies rarely fit cleanly into one column.</p>
+      </div>
+    </>
+  );
+}
+
+// Step 3
+function StepAboutYou({ survey, setSurvey }) {
+  function pick(field, value) {
+    setSurvey(s => ({ ...s, [field]: value }));
+  }
+  function toggleMulti(field, value) {
+    setSurvey(s => {
+      const arr = s[field] || [];
+      return { ...s, [field]: arr.includes(value) ? arr.filter(x => x !== value) : [...arr, value] };
+    });
+  }
+
+  return (
+    <>
+      <p className="step-eyebrow">Step 3 of 4</p>
+      <h2 className="step-title">About You</h2>
+      <p className="step-intro">
+        Your circumstances shape which policy trade-offs matter most to you. Answer as much or as little as you like — the breakdown in the next step uses your answers to add context.
+      </p>
+
+      <div className="privacy-banner">
+        Nothing you enter here is saved, stored, or transmitted anywhere. It all stays in this browser tab and disappears when you close it.
+      </div>
+
+      <div className="question-block">
+        <p className="question-label">What is your approximate household income?</p>
+        <div className="btn-grid">
+          {INCOME_RANGES.map(opt => (
+            <button key={opt} className={`choice-btn${survey.income === opt ? " selected" : ""}`}
+              onClick={() => pick("income", opt)}>{opt}</button>
+          ))}
+        </div>
+      </div>
+
+      <hr className="rule" />
+
+      <div className="question-block">
+        <p className="question-label">Roughly how much do you pay in income taxes each year?</p>
+        <div className="btn-grid">
+          {TAX_RANGES.map(opt => (
+            <button key={opt} className={`choice-btn${survey.taxes === opt ? " selected" : ""}`}
+              onClick={() => pick("taxes", opt)}>{opt}</button>
+          ))}
+        </div>
+      </div>
+
+      <hr className="rule" />
+
+      <div className="question-block">
+        <p className="question-label">Do you or your household currently receive any of the following? <span style={{fontStyle:"italic", fontWeight:400}}>(select all that apply)</span></p>
+        <div className="btn-grid">
+          {BENEFITS_OPTIONS.map(opt => (
+            <button key={opt}
+              className={`choice-btn${(survey.benefits || []).includes(opt) ? " selected" : ""}`}
+              onClick={() => toggleMulti("benefits", opt)}>{opt}</button>
+          ))}
+        </div>
+      </div>
+
+      <hr className="rule" />
+
+      <div className="question-block">
+        <p className="question-label">How important is religion or faith to your personal worldview?</p>
+        <div className="btn-grid">
+          {RELIGION_OPTIONS.map(opt => (
+            <button key={opt} className={`choice-btn${survey.religion === opt ? " selected" : ""}`}
+              onClick={() => pick("religion", opt)}>{opt}</button>
+          ))}
+        </div>
+      </div>
+
+      <hr className="rule" />
+
+      <div className="question-block">
+        <p className="question-label">Pick up to 3 issues that matter most to you right now.</p>
+        <div className="btn-grid">
+          {ISSUES.map(issue => {
+            const selected = (survey.topIssues || []).includes(issue.id);
+            const maxed = (survey.topIssues || []).length >= 3 && !selected;
+            return (
+              <button key={issue.id}
+                className={`choice-btn${selected ? " selected" : ""}`}
+                style={maxed ? { opacity: .4, cursor: "not-allowed" } : {}}
+                onClick={() => !maxed && toggleMulti("topIssues", issue.id)}>
+                {issue.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="multi-note">Select up to 3. You've selected {(survey.topIssues || []).length} of 3.</p>
+      </div>
+    </>
+  );
+}
+
+// Step 4
+function StepBreakdown({ survey }) {
+  const pickedIssues = ISSUES.filter(i => (survey.topIssues || []).includes(i.id));
+
+  if (pickedIssues.length === 0) {
+    return (
+      <>
+        <p className="step-eyebrow">Step 4 of 4</p>
+        <h2 className="step-title">Your Breakdown</h2>
+        <p className="step-intro">You didn't select any issues in the previous step. Go back and pick up to 3 to see a personalized breakdown here.</p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="step-eyebrow">Step 4 of 4</p>
+      <h2 className="step-title">Your Breakdown</h2>
+      <p className="breakdown-intro">
+        For each issue you chose, here's how a more limited-government approach and a more active-government approach typically frame the problem and solution. This is context — not a recommendation. You decide what weight to give each.
+      </p>
+
+      {pickedIssues.map((issue) => {
+        const contextNote = issue.contextFn(survey);
+        return (
+          <div key={issue.id} className="issue-breakdown">
+            <p className="issue-breakdown-title">{issue.label}</p>
+            <div className="approach-pair">
+              <div className="approach-card">
+                <p className="approach-label">Limited-Government Approach</p>
+                <p>{issue.limited}</p>
+              </div>
+              <div className="approach-card">
+                <p className="approach-label">Active-Government Approach</p>
+                <p>{issue.active}</p>
+              </div>
+            </div>
+            {contextNote && <p className="context-note">↳ {contextNote}</p>}
+          </div>
+        );
+      })}
+
+      <div className="research-box">
+        <h3>How to Research Real Candidates Yourself</h3>
+        <p style={{ fontSize: ".88rem", color: "var(--ink2)", marginBottom: 14 }}>
+          Knowing the issues is step one. Finding out where actual candidates on your ballot stand — in verifiable, specific terms — is step two. Here's how to do it without relying on any single source.
+        </p>
+        <ol>
+          {RESEARCH_STEPS.map((s, i) => <li key={i}>{s.text}</li>)}
+        </ol>
+        <p className="trade-off-note">
+          Every policy involves trade-offs. The most useful question to ask any candidate: "What are you giving up to get this outcome — and who bears that cost?" A candidate who can answer that honestly is showing you something important.
+        </p>
+      </div>
+    </>
+  );
+}
+
+/* ── Main App ── */
+export default function CivicCompass() {
+  const [step, setStep] = useState(1);
+  const [survey, setSurvey] = useState({
+    income: "",
+    taxes: "",
+    benefits: [],
+    religion: "",
+    topIssues: [],
+  });
+
+  const canAdvance = step < TOTAL_STEPS;
+  const canGoBack  = step > 1;
+
+  return (
+    <div className="page-shell">
+      <header className="masthead">
+        <p className="masthead-eyebrow">A nonpartisan voter education guide</p>
+        <h1 className="masthead-title">Civic Compass</h1>
+        <p className="masthead-sub">Understanding your government before you vote</p>
+      </header>
+
+      <ProgressBar step={step} />
+
+      {step === 1 && <StepBranches />}
+      {step === 2 && <StepSystems />}
+      {step === 3 && <StepAboutYou survey={survey} setSurvey={setSurvey} />}
+      {step === 4 && <StepBreakdown survey={survey} />}
+
+      <div className="nav-row">
+        <button className="nav-btn" onClick={() => setStep(s => s - 1)} disabled={!canGoBack}>
+          ← Back
+        </button>
+        <span className="step-counter">Step {step} of {TOTAL_STEPS}</span>
+        {canAdvance
+          ? <button className="nav-btn primary" onClick={() => setStep(s => s + 1)}>
+              Next →
+            </button>
+          : <button className="nav-btn primary" onClick={() => setStep(1)}>
+              Start Over
+            </button>
+        }
+      </div>
+    </div>
+  );
+}
+
+/* ── Mount ── */
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<CivicCompass />);
+</script>
+</body>
+</html>
